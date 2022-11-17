@@ -1,0 +1,140 @@
+﻿@page
+@model Luisapangilinan.Midterm.Pages.Manage.Classes.Index
+
+
+<h3>Users</h3>
+
+<div class="search">
+    <i class="bi bi-search"></i>
+    <input type="text" class="form-control" placeholder="Search" id="search" value="@Model?.View?.Classes?.Keyword">
+</div>
+
+<div class="row">
+    <div class="col-3">
+        <div class="form-group">
+            <label for="">Sort By</label>
+            <select class="form-control" id="sortBy" asp-for="View.Courses">
+                <option value="">choose</option>
+                <option value="name">Name</option>
+                <option value="description">Description</option>
+                <option value="abbreviation">Abbreviation</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            <label for="">Sort Order</label>
+            <select class="form-control" id="sortOrder" asp-for="View.Classes.SortOrder">
+                <option value="1">Ascending</option>
+                <option value="2">Descending</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            <label for="">Role</label>
+            <select class="form-control select2" id="CourseId">
+                @{
+                    if(Model.View.CourseID != null)
+                    {
+                        <option selected value="@Model.View.CourseID">@Model.View.CourseID</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+</div>
+
+
+
+@{
+    if (Model.View != null && Model.View.Classes != null && Model.View.Classes.Items != null && Model.View.Classes.Items.Count > 0)
+    {
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email Address</th>
+                    <th scope="col">Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var Class in Model.View.Classes.Items)
+                    {
+                        <tr>
+                            <th scope="row">@Class.Code</th>
+                            <td>@Class.CourseId</td>
+                            <td>@Class.Course?.Abbreviation</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                @{
+                    if (Model?.View?.Classes.PageIndex > 1)
+                    {
+                        <li class="page-item"><a class="page-link" href="/manage/classes?pageIndex=@(Model?.View?.Classes.PageIndex-1)&pageSize=@(Model?.View?.Classes.PageSize)&sortBy=@(Model?.View?.Classes.SortBy)&sortOrder=@(Model?.View?.Classes.SortOrder)&roleId=@(Model?.View?.CourseID)">Previous</a></li>
+                    }
+
+                    <li class="page-item"><span class="page-link">page @Model?.View?.Classes.PageIndex of @Model?.View?.Classes.PageCount (@Model?.View?.Classes.TotalRows total rows)</span></li>
+
+
+                    if (Model?.View?.Classes.PageIndex < Model?.View?.Classes.PageCount)
+                    {
+                        <li class="page-item"><a class="page-link" href="/manage/classes?pageIndex=@(Model?.View?.Classes.PageIndex+1)&pageSize=@(Model?.View?.Classes.PageSize)&sortBy=@(Model?.View?.Classes.SortBy)&sortOrder=@(Model?.View?.Classes.SortOrder)&roleId=@(Model?.View?.CourseID)">Next</a></li>
+                    }
+                }
+            </ul>
+        </nav>
+    }
+    else
+    {
+        <div>There are no records to show.</div>
+    }
+}
+
+@section Scripts
+    {
+    <script>
+        $(document).ready(function () {
+            $('#roleId').select2({
+                ajax: {
+                    url: '?handler=RolesLookup',
+                    headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+                    data: function (params) {
+                        var query = {
+                            keyword: params.term,
+                            page: params.page || 1
+                        }
+
+                        return query;
+                    }
+                }
+            });
+        });
+
+
+        $("#search").keyup(function (event) {
+            if (event.keyCode === 13) {
+                window.location = "/manage/classes?keyword=" + $("#search").val() + "&roleId=" + $("#roleId").val();
+            }
+        });
+
+        $("#sortBy").change(function () {
+            window.location = "/manage/classes?keyword=@(Model?.View?.Classes?.Keyword)&sortBy=" + $("#sortBy").val() + "&sortOrder=" + $("#sortOrder").val() + "&roleId=" + $("#roleId").val();
+        });
+
+        $("#sortOrder").change(function () {
+            window.location = "/manage/classes?keyword=@(Model?.View?.Classes?.Keyword)&sortBy=" + $("#sortBy").val() + "&sortOrder=" + $("#sortOrder").val() + "&roleId=" + $("#roleId").val();
+        });
+
+        $("#roleId").change(function () {
+            window.location = "/manage/classes?keyword=@(Model?.View?.Classes?.Keyword)&sortBy=" + $("#sortBy").val() + "&sortOrder=" + $("#sortOrder").val() + "&roleId=" + $("#roleId").val();
+        });
+    </script>
+}
+}
